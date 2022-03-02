@@ -38,7 +38,8 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+        # $category = Category::findOrFail(id);
+        return new CategoryResource($category);
     }
 
     /**
