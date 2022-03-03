@@ -18,7 +18,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        return TransactionResource::collection(Transaction::all());
+        return TransactionResource::collection(Transaction::with('category')->get());
     }
 
     /**
