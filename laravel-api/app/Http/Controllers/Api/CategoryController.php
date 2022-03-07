@@ -28,13 +28,15 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        return new CategoryResource(Category::create($request->validated()));
+        // $category = Category::create($request->validated() + ['user_id' => auth()->id()]);
+        $category = auth()->user()->categories()->create($request->validated());
+        return new CategoryResource($category);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Category  $category
+     * @param \App\Models\Category $category
      * @return \Illuminate\Http\Response
      */
     public function show(Category $category)
@@ -60,7 +62,7 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Category  $category
+     * @param \App\Models\Category $category
      * @return \Illuminate\Http\Response
      */
     public function destroy(Category $category)
