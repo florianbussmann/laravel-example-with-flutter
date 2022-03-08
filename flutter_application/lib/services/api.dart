@@ -7,7 +7,7 @@ import 'package:flutter_application/models/category.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  ApiService();
+  ApiService([String token = '']);
 
   Future<List<Category>> fetchCategories() async {
     http.Response response =

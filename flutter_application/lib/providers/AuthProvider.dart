@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/services/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool isAuthenticated = false;
+  late String token;
   late ApiService apiService;
 
   AuthProvider() {
-    apiService = ApiService();
+    init();
+  }
+
+  Future<void> init() async {
+    token = await getToken();
+    if (token.isNotEmpty) {
+      isAuthenticated = true;
+    }
+    apiService = ApiService(token);
+    notifyListeners();
   }
 
   Future<String> register(String name, String email, String password,
       String passwordConfirm, String deviceName) async {
-    String token = await apiService.register(
+    token = await apiService.register(
         name, email, password, passwordConfirm, deviceName);
+    setToken(token);
     isAuthenticated = true;
     notifyListeners();
 
@@ -20,10 +32,21 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<String> login(String email, String password, String deviceName) async {
-    String token = await apiService.login(email, password, deviceName);
+    token = await apiService.login(email, password, deviceName);
+    setToken(token);
     isAuthenticated = true;
     notifyListeners();
 
     return token;
+  }
+
+  Future<void> setToken(String token) async {
+    final pref = await SharedPreferences.getInstance();
+    pref.setString('token', token);
+  }
+
+  Future<String> getToken() async {
+    final pref = await SharedPreferences.getInstance();
+    return pref.getString('token') ?? '';
   }
 }
