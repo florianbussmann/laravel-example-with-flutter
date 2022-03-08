@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application/providers/AuthProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +24,13 @@ class _RegisterState extends State<Register> {
   final passwordConfirmController = TextEditingController();
 
   String errorMessage = '';
+  late String deviceName;
+
+  @override
+  void initState() {
+    super.initState();
+    getDeviceName();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,13 +160,54 @@ class _RegisterState extends State<Register> {
           emailController.text,
           passwordController.text,
           passwordConfirmController.text,
-          'mobile');
+          deviceName);
 
       Navigator.pop(context);
     } catch (exception) {
       // The exception message comes with "Exception: ..." in the beginning
       setState(() {
         errorMessage = exception.toString().replaceAll('Exception: ', '');
+      });
+    }
+  }
+
+  Future<void> getDeviceName() async {
+    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
+    try {
+      if (Platform.isAndroid) {
+        var build = await deviceInfoPlugin.androidInfo;
+        setState(() {
+          deviceName = build.model!;
+        });
+      } else if (Platform.isIOS) {
+        var build = await deviceInfoPlugin.iosInfo;
+        setState(() {
+          deviceName = build.utsname.machine!;
+        });
+      } else {
+        var build = await deviceInfoPlugin.deviceInfo;
+        var map = build.toMap();
+        List<String> keys = ["model", "userAgent"];
+        bool fallback = true;
+        for (var key in keys) {
+          if (map.containsKey(key)) {
+            setState(() {
+              deviceName = map[key];
+            });
+            fallback = false;
+            break;
+          }
+        }
+        if (fallback) {
+          setState(() {
+            deviceName = 'Failed to get device info';
+          });
+        }
+      }
+    } on PlatformException {
+      setState(() {
+        deviceName = 'Failed to get platform version';
       });
     }
   }
