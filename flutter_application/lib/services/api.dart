@@ -18,6 +18,29 @@ class ApiService {
     return categories.map((category) => Category.fromJson(category)).toList();
   }
 
+  Future<Category> addCategory(String name) async {
+    String uri = globals.baseUrl + '/categories';
+
+    http.Response response = await http.post(
+      Uri.parse(uri),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+      },
+      body: jsonEncode(
+        {
+          'name': name,
+        },
+      ),
+    );
+
+    if (response.statusCode != HttpStatus.created) {
+      throw Exception('Error happened on create');
+    }
+
+    return Category.fromJson(jsonDecode(response.body));
+  }
+
   Future<Category> updateCategory(Category category) async {
     String uri = globals.baseUrl + '/categories/' + category.id.toString();
 
