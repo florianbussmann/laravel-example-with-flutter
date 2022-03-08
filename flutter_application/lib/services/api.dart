@@ -114,4 +114,37 @@ class ApiService {
 
     return response.body;
   }
+
+  Future<String> login(String email, String password, String deviceName) async {
+    String uri = globals.baseUrl + '/auth/login';
+
+    http.Response response = await http.post(
+      Uri.parse(uri),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+      },
+      body: jsonEncode(
+        {
+          'email': email,
+          'password': password,
+          'device_name': deviceName,
+        },
+      ),
+    );
+
+    if (response.statusCode == HttpStatus.unprocessableEntity) {
+      Map<String, dynamic> body = jsonDecode(response.body);
+      Map<String, dynamic> errors = body['errors'];
+      String errorMessage = '';
+      errors.forEach((key, value) {
+        for (var element in value) {
+          errorMessage += element + '\n';
+        }
+      });
+      throw Exception(errorMessage);
+    }
+
+    return response.body;
+  }
 }
