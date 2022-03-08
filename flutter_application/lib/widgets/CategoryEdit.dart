@@ -4,8 +4,10 @@ import 'package:flutter_application/services/api.dart';
 
 class CategoryEdit extends StatefulWidget {
   final Category category;
+  final Function categoryCallback;
 
-  CategoryEdit(this.category, {Key? key}) : super(key: key);
+  CategoryEdit(this.category, this.categoryCallback, {Key? key})
+      : super(key: key);
 
   @override
   _CategoryEditState createState() => _CategoryEditState();
@@ -79,8 +81,10 @@ class _CategoryEditState extends State<CategoryEdit> {
       return;
     }
 
-    apiService
-        .updateCategory(widget.category.id, categoryNameController.text)
+    widget.category.name = categoryNameController.text;
+
+    widget
+        .categoryCallback(widget.category)
         .then((category) => Navigator.pop(context))
         .catchError((exception) {
       setState(() {

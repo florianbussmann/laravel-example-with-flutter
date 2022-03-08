@@ -18,8 +18,8 @@ class ApiService {
     return categories.map((category) => Category.fromJson(category)).toList();
   }
 
-  Future<Category> updateCategory(id, name) async {
-    String uri = globals.baseUrl + '/categories/' + id.toString();
+  Future<Category> updateCategory(Category category) async {
+    String uri = globals.baseUrl + '/categories/' + category.id.toString();
 
     http.Response response = await http.put(
       Uri.parse(uri),
@@ -29,7 +29,7 @@ class ApiService {
       },
       body: jsonEncode(
         {
-          'name': name,
+          'name': category.name,
         },
       ),
     );
