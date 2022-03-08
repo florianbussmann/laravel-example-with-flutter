@@ -1,6 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/providers/AuthProvider.dart';
+import 'package:provider/provider.dart';
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _RegisterState();
+  }
+}
+
+class _RegisterState extends State<Register> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final passwordConfirmController = TextEditingController();
+
+  String errorMessage = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,51 +42,88 @@ class Register extends StatelessWidget {
               margin: EdgeInsets.symmetric(horizontal: 16.0),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: <Widget>[
-                    const TextField(
-                      keyboardType: TextInputType.name,
-                      decoration: InputDecoration(
-                        labelText: 'Name',
-                      ),
-                    ),
-                    const TextField(
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                      ),
-                    ),
-                    const TextField(
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                      ),
-                    ),
-                    const TextField(
-                      keyboardType: TextInputType.visiblePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Confirm Password',
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/categories');
-                      },
-                      child: Text('Register'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 36),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20.0),
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        keyboardType: TextInputType.name,
+                        controller: nameController,
+                        validator: (String? value) {
+                          if (value!.isEmpty) {
+                            return 'Enter name';
+                          }
                         },
-                        child: Text('<- Back to Login'),
+                        onChanged: (text) => setState(() => errorMessage = ''),
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                        ),
                       ),
-                    ),
-                  ],
+                      TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        controller: emailController,
+                        validator: (String? value) {
+                          if (value!.isEmpty) {
+                            return 'Enter email';
+                          }
+                        },
+                        onChanged: (text) => setState(() => errorMessage = ''),
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                        ),
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        controller: passwordController,
+                        validator: (String? value) {
+                          if (value!.isEmpty) {
+                            return 'Enter password';
+                          }
+                        },
+                        onChanged: (text) => setState(() => errorMessage = ''),
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                        ),
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        controller: passwordConfirmController,
+                        validator: (String? value) {
+                          if (value!.isEmpty) {
+                            return 'Repeat password';
+                          }
+                        },
+                        onChanged: (text) => setState(() => errorMessage = ''),
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => submit(),
+                        child: Text('Register'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 36),
+                        ),
+                      ),
+                      Text(
+                        errorMessage,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('<- Back to Login'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -74,5 +131,32 @@ class Register extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> submit() async {
+    final form = _formKey.currentState;
+
+    if (!form!.validate()) {
+      return;
+    }
+
+    final AuthProvider provider =
+        Provider.of<AuthProvider>(context, listen: false);
+
+    try {
+      String token = await provider.register(
+          nameController.text,
+          emailController.text,
+          passwordController.text,
+          passwordConfirmController.text,
+          'mobile');
+
+      Navigator.pop(context);
+    } catch (exception) {
+      // The exception message comes with "Exception: ..." in the beginning
+      setState(() {
+        errorMessage = exception.toString().replaceAll('Exception: ', '');
+      });
+    }
   }
 }
