@@ -24,4 +24,11 @@ class CategoryProvider extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future<void> deleteCategory(Category category) async {
+    await apiService.deleteCategory(category.id);
+    categories.remove(category);
+
+    notifyListeners();
+  }
 }
