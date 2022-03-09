@@ -173,6 +173,34 @@ class ApiService {
         .toList();
   }
 
+  Future<Transaction> addTransaction(String amount, String categoryId,
+      String description, String transactionDate) async {
+    String uri = globals.baseUrl + '/transactions';
+
+    http.Response response = await http.post(
+      Uri.parse(uri),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
+      },
+      body: jsonEncode(
+        {
+          'amount': amount,
+          'category_id': categoryId,
+          'description': description,
+          'transaction_date': transactionDate,
+        },
+      ),
+    );
+
+    if (response.statusCode != HttpStatus.created) {
+      throw Exception('Error happened on create');
+    }
+
+    return Transaction.fromJson(jsonDecode(response.body));
+  }
+
   Future<void> deleteTransaction(int id) async {
     String uri = globals.baseUrl + '/transactions/' + id.toString();
 

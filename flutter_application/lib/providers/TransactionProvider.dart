@@ -20,6 +20,15 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future addTransaction(String amount, String category, String description,
+      String transactionDate) async {
+    Transaction addedTransaction = await apiService.addTransaction(
+        amount, category, description, transactionDate);
+    transactions.add(addedTransaction);
+
+    notifyListeners();
+  }
+
   Future<void> deleteTransaction(Transaction transaction) async {
     await apiService.deleteTransaction(transaction.id);
     transactions.remove(transaction);

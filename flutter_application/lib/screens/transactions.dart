@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/models/transaction.dart';
 import 'package:flutter_application/providers/TransactionProvider.dart';
+import 'package:flutter_application/widgets/TransactionAdd.dart';
 import 'package:provider/provider.dart';
 
 class Transactions extends StatefulWidget {
@@ -78,6 +79,18 @@ class _TransactionsState extends State<Transactions> {
               ),
             );
           },
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) {
+                return TransactionAdd(provider.addTransaction);
+              },
+            );
+          },
+          child: Icon(Icons.add),
         ),
       ),
     );
