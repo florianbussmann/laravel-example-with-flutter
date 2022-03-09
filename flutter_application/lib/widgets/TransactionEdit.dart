@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_application/models/category.dart';
 import 'package:flutter_application/models/transaction.dart';
 import 'package:flutter_application/providers/CategoryProvider.dart';
+import 'package:flutter_application/widgets/CategoryWidgets.dart';
+import 'package:flutter_application/widgets/DateSelector.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -45,68 +47,59 @@ class _TransactionEditState extends State<TransactionEdit> {
         key: _formKey,
         child: Column(
           children: <Widget>[
-            TextFormField(
-              onChanged: (text) => setState(() => errorMessage = ''),
-              controller: transactionAmountController,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'^-?(\d+\.?\d{0,2})?'),
+            Wrap(
+              runSpacing: 8.0,
+              children: [
+                TextFormField(
+                  onChanged: (text) => setState(() => errorMessage = ''),
+                  controller: transactionAmountController,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^-?(\d+\.?\d{0,2})?'),
+                    ),
+                  ],
+                  validator: (String? value) {
+                    if (value!.trim().isEmpty) {
+                      return 'Amount is required';
+                    }
+                    final newValue = double.tryParse(value);
+
+                    if (newValue == null) {
+                      return 'Invalid amount format';
+                    }
+
+                    return null;
+                  },
+                  keyboardType: TextInputType.numberWithOptions(
+                      signed: true, decimal: true),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Amount',
+                    icon: Icon(Icons.attach_money),
+                    hintText: '0',
+                  ),
                 ),
+                buildCategoriesDropdown(
+                  this,
+                  transactionCategoryController,
+                ),
+                TextFormField(
+                  onChanged: (text) => setState(() => errorMessage = ''),
+                  controller: transactionDescriptionController,
+                  validator: (String? value) {
+                    if (value!.trim().isEmpty) {
+                      return 'Description is required';
+                    }
+
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Description',
+                  ),
+                ),
+                DateSelector(this, transactionDateController),
               ],
-              validator: (String? value) {
-                if (value!.trim().isEmpty) {
-                  return 'Amount is required';
-                }
-                final newValue = double.tryParse(value);
-
-                if (newValue == null) {
-                  return 'Invalid amount format';
-                }
-
-                return null;
-              },
-              keyboardType:
-                  TextInputType.numberWithOptions(signed: true, decimal: true),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Amount',
-                icon: Icon(Icons.attach_money),
-                hintText: '0',
-              ),
-            ),
-            buildCategoriesDropdown(),
-            TextFormField(
-              onChanged: (text) => setState(() => errorMessage = ''),
-              controller: transactionDescriptionController,
-              validator: (String? value) {
-                if (value!.trim().isEmpty) {
-                  return 'Description is required';
-                }
-
-                return null;
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Description',
-              ),
-            ),
-            TextFormField(
-              onChanged: (text) => setState(() => errorMessage = ''),
-              controller: transactionDateController,
-              validator: (String? value) {
-                if (value!.trim().isEmpty) {
-                  return 'Date is required';
-                }
-
-                return null;
-              },
-              onTap: () {
-                selectDate(context);
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Transaction date',
-              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,61 +124,6 @@ class _TransactionEditState extends State<TransactionEdit> {
           ],
         ),
       ),
-    );
-  }
-
-  Future selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(DateTime.now().year - 5),
-        lastDate: DateTime(DateTime.now().year + 5));
-
-    if (picked != null) {
-      setState(() {
-        transactionDateController.text =
-            DateFormat('MM/dd/yyyy').format(picked);
-      });
-    }
-  }
-
-  Widget buildCategoriesDropdown() {
-    return Consumer<CategoryProvider>(
-      builder: (context, categoryProvider, child) {
-        List<Category> categories = categoryProvider.categories;
-
-        return DropdownButtonFormField(
-          items: categories.map<DropdownMenuItem<String>>((element) {
-            return DropdownMenuItem(
-              value: element.id.toString(),
-              child: Text(
-                element.name,
-                style: TextStyle(color: Colors.black, fontSize: 20.0),
-              ),
-            );
-          }).toList(),
-          value: transactionCategoryController.text,
-          onChanged: (String? newValue) {
-            if (newValue == null) {
-              return;
-            }
-
-            setState(() {
-              transactionCategoryController.text = newValue.toString();
-            });
-          },
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Category',
-          ),
-          dropdownColor: Colors.white,
-          validator: (value) {
-            if (value == null) {
-              return 'Please select category';
-            }
-          },
-        );
-      },
     );
   }
 
