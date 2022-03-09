@@ -20,24 +20,20 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String> register(String name, String email, String password,
+  Future<void> register(String name, String email, String password,
       String passwordConfirm, String deviceName) async {
     token = await apiService.register(
         name, email, password, passwordConfirm, deviceName);
     setToken(token);
     isAuthenticated = true;
     notifyListeners();
-
-    return token;
   }
 
-  Future<String> login(String email, String password, String deviceName) async {
+  Future<void> login(String email, String password, String deviceName) async {
     token = await apiService.login(email, password, deviceName);
     setToken(token);
     isAuthenticated = true;
     notifyListeners();
-
-    return token;
   }
 
   Future<void> setToken(String token) async {

@@ -125,7 +125,7 @@ class _LoginState extends State<Login> {
         Provider.of<AuthProvider>(context, listen: false);
 
     try {
-      String token = await provider.login(
+      await provider.login(
           emailController.text, passwordController.text, deviceName);
     } catch (exception) {
       // The exception message comes with "Exception: ..." in the beginning

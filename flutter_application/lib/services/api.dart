@@ -7,11 +7,18 @@ import 'package:flutter_application/models/category.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  ApiService([String token = '']);
+  late String _token;
+
+  ApiService(String token) {
+    _token = token;
+  }
 
   Future<List<Category>> fetchCategories() async {
     http.Response response =
-        await http.get(Uri.parse(globals.baseUrl + '/categories'));
+        await http.get(Uri.parse(globals.baseUrl + '/categories'), headers: {
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $_token',
+    });
 
     List categories = jsonDecode(response.body);
 
@@ -26,6 +33,7 @@ class ApiService {
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
       },
       body: jsonEncode(
         {
@@ -49,6 +57,7 @@ class ApiService {
       headers: {
         HttpHeaders.contentTypeHeader: 'application/json',
         HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
       },
       body: jsonEncode(
         {
@@ -71,6 +80,7 @@ class ApiService {
       Uri.parse(uri),
       headers: {
         HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
       },
     );
 

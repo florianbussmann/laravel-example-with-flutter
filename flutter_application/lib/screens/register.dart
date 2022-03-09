@@ -155,12 +155,8 @@ class _RegisterState extends State<Register> {
         Provider.of<AuthProvider>(context, listen: false);
 
     try {
-      String token = await provider.register(
-          nameController.text,
-          emailController.text,
-          passwordController.text,
-          passwordConfirmController.text,
-          deviceName);
+      await provider.register(nameController.text, emailController.text,
+          passwordController.text, passwordConfirmController.text, deviceName);
 
       Navigator.pop(context);
     } catch (exception) {
