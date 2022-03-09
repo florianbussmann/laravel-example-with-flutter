@@ -172,4 +172,20 @@ class ApiService {
         .map((category) => Transaction.fromJson(category))
         .toList();
   }
+
+  Future<void> deleteTransaction(int id) async {
+    String uri = globals.baseUrl + '/transactions/' + id.toString();
+
+    http.Response response = await http.delete(
+      Uri.parse(uri),
+      headers: {
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode != HttpStatus.noContent) {
+      throw Exception('Error happened on delete');
+    }
+  }
 }

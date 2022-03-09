@@ -19,4 +19,11 @@ class TransactionProvider extends ChangeNotifier {
     transactions = await apiService.fetchTransactions();
     notifyListeners();
   }
+
+  Future<void> deleteTransaction(Transaction transaction) async {
+    await apiService.deleteTransaction(transaction.id);
+    transactions.remove(transaction);
+
+    notifyListeners();
+  }
 }

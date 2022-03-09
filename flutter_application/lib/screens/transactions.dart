@@ -53,7 +53,14 @@ class _TransactionsState extends State<Transactions> {
                           content: Text('Are you sure you want to delete?'),
                           actions: [
                             TextButton(
-                              onPressed: null,
+                              onPressed: () {
+                                provider
+                                    .deleteTransaction(transaction)
+                                    .then((category) => Navigator.pop(context))
+                                    .catchError((exception) {
+                                  print(exception);
+                                });
+                              },
                               child: Text('Confirm'),
                             ),
                             TextButton(
