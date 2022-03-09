@@ -54,7 +54,13 @@ class CategoriesState extends State<Categories> {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              deleteCategory(provider.deleteCategory, category);
+                              provider
+                                  .deleteCategory(category)
+                                  .then(
+                                      (category) => Navigator.of(context).pop())
+                                  .catchError((exception) {
+                                print(exception);
+                              });
                             },
                             child: Text('Confirm'),
                           ),
@@ -87,13 +93,5 @@ class CategoriesState extends State<Categories> {
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  Future<void> deleteCategory(Function callback, Category category) async {
-    await callback(category)
-        .then((category) => Navigator.pop(context))
-        .catchError((exception) {
-      print(exception);
-    });
   }
 }
