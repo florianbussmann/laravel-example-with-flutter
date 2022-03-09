@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/models/transaction.dart';
 import 'package:flutter_application/providers/TransactionProvider.dart';
 import 'package:flutter_application/widgets/TransactionAdd.dart';
+import 'package:flutter_application/widgets/TransactionEdit.dart';
 import 'package:provider/provider.dart';
 
 class Transactions extends StatefulWidget {
@@ -42,7 +43,16 @@ class _TransactionsState extends State<Transactions> {
                   ),
                   IconButton(
                     icon: Icon(Icons.edit),
-                    onPressed: null,
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (context) {
+                          return TransactionEdit(
+                              transaction, provider.updateTransaction);
+                        },
+                      );
+                    },
                   ),
                   IconButton(
                     icon: Icon(Icons.delete),

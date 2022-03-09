@@ -187,7 +187,7 @@ class ApiService {
       body: jsonEncode(
         {
           'amount': amount,
-          'category_id': categoryId,
+          'category_id': int.parse(categoryId),
           'description': description,
           'transaction_date': transactionDate,
         },
@@ -196,6 +196,33 @@ class ApiService {
 
     if (response.statusCode != HttpStatus.created) {
       throw Exception('Error happened on create');
+    }
+
+    return Transaction.fromJson(jsonDecode(response.body));
+  }
+
+  Future<Transaction> updateTransaction(Transaction transaction) async {
+    String uri = globals.baseUrl + '/transactions/' + transaction.id.toString();
+
+    http.Response response = await http.put(
+      Uri.parse(uri),
+      headers: {
+        HttpHeaders.contentTypeHeader: 'application/json',
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.authorizationHeader: 'Bearer $_token',
+      },
+      body: jsonEncode(
+        {
+          'amount': transaction.amount,
+          'category_id': transaction.categoryId,
+          'description': transaction.description,
+          'transaction_date': transaction.transactionDate,
+        },
+      ),
+    );
+
+    if (response.statusCode != HttpStatus.ok) {
+      throw Exception('Error happened on update');
     }
 
     return Transaction.fromJson(jsonDecode(response.body));

@@ -29,6 +29,15 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future updateTransaction(Transaction transaction) async {
+    Transaction updatedTransaction =
+        await apiService.updateTransaction(transaction);
+    int index = transactions.indexOf(transaction);
+    transactions[index] = updatedTransaction;
+
+    notifyListeners();
+  }
+
   Future<void> deleteTransaction(Transaction transaction) async {
     await apiService.deleteTransaction(transaction.id);
     transactions.remove(transaction);

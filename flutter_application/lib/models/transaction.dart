@@ -20,7 +20,7 @@ class Transaction {
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       id: json['id'],
-      categoryId: int.parse(json['category_id']),
+      categoryId: json['category_id'],
       categoryName: json['category_name'],
       description: json['description'],
       amount: json['amount'],
