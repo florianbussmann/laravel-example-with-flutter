@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_application/globals.dart' as globals;
 import 'package:flutter_application/models/category.dart';
+import 'package:flutter_application/models/transaction.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -66,7 +67,7 @@ class ApiService {
       ),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode != HttpStatus.ok) {
       throw Exception('Error happened on update');
     }
 
@@ -156,5 +157,19 @@ class ApiService {
     }
 
     return response.body;
+  }
+
+  Future<List<Transaction>> fetchTransactions() async {
+    http.Response response =
+        await http.get(Uri.parse(globals.baseUrl + '/transactions'), headers: {
+      HttpHeaders.acceptHeader: 'application/json',
+      HttpHeaders.authorizationHeader: 'Bearer $_token',
+    });
+
+    List transactions = jsonDecode(response.body);
+
+    return transactions
+        .map((category) => Transaction.fromJson(category))
+        .toList();
   }
 }
